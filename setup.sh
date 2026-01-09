@@ -23,14 +23,29 @@ echo -e "${BLUE}╚════════════════════�
 echo ""
 
 # Check if Claude Code is installed
-if ! command -v claude &> /dev/null; then
-    echo -e "${YELLOW}⚠️  Warning: Claude CLI not found${NC}"
+CLAUDE_FOUND=false
+if command -v claude &> /dev/null; then
+    CLAUDE_FOUND=true
+elif command -v claude.exe &> /dev/null; then
+    CLAUDE_FOUND=true
+elif [ -f "$HOME/.local/bin/claude" ] || [ -f "$HOME/.local/bin/claude.exe" ]; then
+    CLAUDE_FOUND=true
+fi
+
+if [ "$CLAUDE_FOUND" = false ]; then
+    echo -e "${YELLOW}⚠️  Warning: Claude CLI not found in PATH${NC}"
     echo "   Some features require Claude Code v2.1.0+"
-    echo "   Continue anyway? [y/N]"
+    echo "   If you installed Claude on Windows, you may need to:"
+    echo "   1. Restart your terminal/bash session, OR"
+    echo "   2. Run: export PATH=\"\$HOME/.local/bin:\$PATH\""
+    echo ""
+    echo "   Continue setup anyway? [y/N]"
     read -r response
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
         exit 1
     fi
+else
+    echo -e "${GREEN}✅ Claude CLI detected${NC}"
 fi
 
 # Check if directory already has .claude
